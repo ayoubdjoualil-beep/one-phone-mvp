@@ -1,0 +1,56 @@
+{
+  "entities": {
+    "Order": {
+      "title": "Order",
+      "description": "Customer order placed through COD form",
+      "type": "object",
+      "properties": {
+        "customerName": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "phone": { "type": "string", "minLength": 9, "maxLength": 20 },
+        "wilayaCode": { "type": "string", "minLength": 1, "maxLength": 3 },
+        "wilayaName": { "type": "string", "minLength": 2, "maxLength": 50 },
+        "commune": { "type": "string", "minLength": 2, "maxLength": 100 },
+        "deliveryType": { "type": "string", "enum": ["home", "desk"] },
+        "deliveryFee": { "type": "number" },
+        "items": { "type": "string", "maxLength": 2000 },
+        "totalAmount": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "confirmed", "shipping", "delivered", "cancelled"] },
+        "notes": { "type": "string", "maxLength": 500 },
+        "orderNumber": { "type": "string", "maxLength": 50 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["customerName", "phone", "wilayaCode", "wilayaName", "commune", "deliveryType", "totalAmount", "status", "orderNumber"]
+    },
+    "Product": {
+      "title": "Product",
+      "description": "Store product listing (Phone, Laptop, Watch, Accessory)",
+      "type": "object",
+      "properties": {
+        "title": { "type": "string", "minLength": 2, "maxLength": 200 },
+        "category": { "type": "string", "enum": ["phones", "laptops", "watches", "accessories"] },
+        "price": { "type": "number" },
+        "oldPrice": { "type": "number" },
+        "inStockConstantine": { "type": "boolean" },
+        "warrantyMonths": { "type": "number" },
+        "condition": { "type": "string", "enum": ["new", "caba_pristine", "caba_good"] },
+        "specs": { "type": "string", "maxLength": 2000 },
+        "imageUrl": { "type": "string", "maxLength": 1000 },
+        "description": { "type": "string", "maxLength": 3000 },
+        "isFeatured": { "type": "boolean" },
+        "brand": { "type": "string", "maxLength": 50 },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["title", "category", "price", "inStockConstantine", "warrantyMonths", "condition"]
+    }
+  },
+  "firestore": {
+    "/orders/{orderId}": {
+      "schema": { "$ref": "#/entities/Order" },
+      "description": "Customer cash-on-delivery orders"
+    },
+    "/products/{productId}": {
+      "schema": { "$ref": "#/entities/Product" },
+      "description": "Products catalog available at ONE phone store"
+    }
+  }
+}

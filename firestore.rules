@@ -1,0 +1,66 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // Default deny all
+    match /{document=**} {
+      allow read, write: if false;
+    }
+
+    function isSignedIn() {
+      return request.auth != null;
+    }
+
+    function isAdmin() {
+      return isSignedIn() && (
+        request.auth.token.email == 'djoualilayoub4@gmail.com' ||
+        exists(/databases/$(database)/documents/admins/$(request.auth.uid))
+      );
+    }
+
+    function isValidOrder(data) {
+      return data.customerName is string && data.customerName.size() >= 2 && data.customerName.size() <= 100
+        && data.phone is string && data.phone.size() >= 9 && data.phone.size() <= 20
+        && data.wilayaCode is string && data.wilayaCode.size() <= 10
+        && data.wilayaName is string && data.wilayaName.size() <= 50
+        && data.commune is string && data.commune.size() <= 100
+        && data.deliveryType in ['home', 'desk']
+        && data.totalAmount is number && data.totalAmount > 0
+        && data.status in ['pending', 'confirmed', 'shipping', 'delivered', 'cancelled']
+        && data.orderNumber is string && data.orderNumber.size() <= 50;
+    }
+
+    function isValidProduct(data) {
+      return data.title is string && data.title.size() >= 2 && data.title.size() <= 200
+        && data.category in ['phones', 'laptops', 'watches', 'accessories']
+        && data.price is number && data.price >= 0
+        && data.inStockConstantine is bool
+        && data.warrantyMonths is number
+        && data.condition in ['new', 'caba_pristine', 'caba_good'];
+    }
+
+    // Products catalog
+    match /products/{productId} {
+      allow read: if true;
+      allow create: if isAdmin() && isValidProduct(request.resource.data);
+      allow update: if isAdmin() && isValidProduct(request.resource.data);
+      allow delete: if isAdmin();
+    }
+
+    // Orders placed by customers
+    match /orders/{orderId} {
+      // Any customer can submit a valid COD order
+      allow create: if isValidOrder(request.resource.data);
+      // Admin can view and update order statuses
+      allow read: if isAdmin();
+      allow update: if isAdmin();
+      allow delete: if isAdmin();
+    }
+
+    // Admins registry
+    match /admins/{adminId} {
+      allow read: if isSignedIn();
+      allow write: if isAdmin();
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "ONE phone Constantine - متجر الهواتف والحواسيب",
+  "description": "المتجر الإلكتروني الأول بقسنطينة للهواتف الذكية والحواسيب المحمولة الأصلية مع خدمة التوصيل والدفع عند الاستلام لـ 58 ولاية.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
